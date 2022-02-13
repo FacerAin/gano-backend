@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, status
 from app.routes.patient import router as PatientRouter
 from app.routes.staff import router as StaffRouter
 from app.routes.group import router as GroupRouter
+from app.routes.room import router as RoomRouter
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -18,6 +19,7 @@ def get_application() -> FastAPI:
     app.include_router(PatientRouter, tags=["Patient"], prefix="/patient")
     app.include_router(StaffRouter, tags=["Staff"], prefix="/staff")
     app.include_router(GroupRouter, tags=["Group"], prefix="/group")
+    app.include_router(RoomRouter, tags=["Room"], prefix="/room")
     return app
 
 

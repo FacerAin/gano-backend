@@ -5,7 +5,7 @@ from typing import List
 from app.db.group import *
 from app.models.group import *
 from app.db.staff import get_staff, update_staff
-
+from app.db.room import get_room
 router = APIRouter()
 
 
@@ -48,19 +48,6 @@ async def remove_group_data(id: str):
     raise HTTPException(status_code=404, detail=f"group {id} not found")
 
 
-@router.put("/{id}/room", response_description="Add a Room in Group by id")
-async def add_room_data(id: str):
-    '''
-    방을 어떻게 만들 수 있을까?
-    방에 필요한 것
-    - 방
-    - 침대 개수
-    꼭 방을 만들어서 관리해야 하나?
-    그냥 관리할 수는 없을까?
-    '''
-    pass
-
-
 @router.put("/{group_id}/staff/{staff_id}", response_description="Add a Staff in Group by id")
 async def add_staff_data(group_id: str, staff_id: str):
     group = await get_group(group_id)
@@ -84,12 +71,21 @@ async def add_staff_data(group_id: str, staff_id: str):
     return updated_group
 
 
-    
+@router.put("/{group_id}/room/{room_id}", response_description="Add a Room in Group by id")
+async def add_room_data(group_id: str, room_id: str):
+    group = await get_group(group_id)
+    room = await get_room(room_id)
+    if not group:
+        raise HTTPException(
+            status_code=404, detail=f"Group {group_id} not found")
 
+    if not room:
+        raise HTTPException(
+            status_code=404, detail=f"Room {room_id} not found")
 
-@router.put("/{id}/patient", response_description="Add a patient in Group by id")
-async def add_patient_data(id: str):
-    '''
-    방에 배정하는 방법은?
-    '''
-    pass
+    room_set = set(group['room_list'])
+    room_set.add(room_id)
+    group['room_list'] = list(room_set)
+    updated_group = await update_group(group_id, group)
+
+    return updated_group
