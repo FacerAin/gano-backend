@@ -13,6 +13,12 @@ async def get_staff(id: str) -> dict:
         return staff
     return None
     
+async def get_staff_by_account_id(account_id: str)->dict:
+    staff = staff_collection.find_one({"account_id": account_id})
+    if staff:
+        return staff
+    return None
+
 
 async def get_staffs() -> list:
     staffs = []
