@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from app.routes.patient import router as PatientRouter
 from app.routes.staff import router as StaffRouter
 from app.routes.group import router as GroupRouter
@@ -14,6 +15,12 @@ PROJECT_NAME = "GANO API"
 DEBUG = False
 VERSION = "0.1"
 
+origins = [
+    "http://react.facerain.club",
+    "http://localhost",
+    "http://localhost:8080",
+]
+
 
 def get_application() -> FastAPI:
     app = FastAPI(title=PROJECT_NAME, debug=DEBUG, version=VERSION)
@@ -22,6 +29,10 @@ def get_application() -> FastAPI:
     app.include_router(GroupRouter, tags=["Group"], prefix="/group")
     app.include_router(RoomRouter, tags=["Room"], prefix="/room")
     app.include_router(AuthRouter, tags=["Auth"], prefix="/auth")
+    app.add_middleware(CORSMiddleware, allow_origins=origins,
+                       allow_credentials=True,
+                       allow_methods=["*"],
+                       allow_headers=["*"],)
     return app
 
 

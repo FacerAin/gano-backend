@@ -7,7 +7,11 @@ from bson import ObjectId
 
 class BedSchema(BaseModel):
     bed_no: int = Field(...)
-    patient: PyObjectId = None
+    patient_id: PyObjectId = None
+    name: str = None
+    admission_date: str = None
+    admission_reason: str = None
+    attending_physician: str = None
 
 
 class RoomSchema(BaseModel):
@@ -28,8 +32,18 @@ class RoomSchema(BaseModel):
 
 
 class UpdateRoomSchema(BaseModel):
-    bed_list: Optional[List[PyObjectId]]
+    bed_list: Optional[List[BedSchema]]
     name: Optional[str]
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        arbitrary_types_allowed = True
+        schema_extra: {
+            "example": {
+                "name": "홍길동",
+                "admission_reason": "독감"
+            }
+        }
 
 
 class CreateRoomSchema(BaseModel):

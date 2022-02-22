@@ -27,6 +27,15 @@ async def create_room_data(create_room_data: CreateRoomSchema = Body(...)):
     return room
 
 
+@router.put("/", response_description="Update a room Data", response_model=UpdateRoomSchema)
+async def update_room_data(id: str, room_data: UpdateRoomSchema = Body(...)):
+    request = {key: value for key, value in room_data.dict().items()}
+    room = await update_room(id, request)
+    if room:
+        return room
+    raise HTTPException(status_code=404, detail=f"room {id} not found")
+
+
 @router.delete("/", response_description="Remove a Room by id")
 async def remove_room_data(id: str):
     result = await remove_room(id)
@@ -53,7 +62,12 @@ async def add_patient_data(room_id: str, patient_id: str, add_patient_data: AddP
         raise HTTPException(
             status_code=404, detail=f"Bed_no {bed_no} not found")
 
-    room['bed_list'][bed_no - 1]['patient'] = patient_id
+    room['bed_list'][bed_no - 1]['patient_id'] = patient_id
+    room['bed_list'][bed_no - 1]['name'] = patient['name']
+    room['bed_list'][bed_no - 1]['admission_date'] = patient['admission_date']
+    room['bed_list'][bed_no - 1]['admission_reason'] = patient['admission_reason']
+    room['bed_list'][bed_no - 1]['attending_physician'] = patient['attending_physician']
+
     updated_room = await update_room(room_id, room)
     return updated_room
 
@@ -76,6 +90,6 @@ async def add_patient_data(room_id: str, patient_id: str, add_patient_data: AddP
         raise HTTPException(
             status_code=404, detail=f"Bed_no {bed_no} not found")
 
-    room['bed_list'][bed_no - 1]['patient'] = None
+    room['bed_list'][bed_no - 1]['patient_id'] = None
     updated_room = await update_room(room_id, room)
     return updated_room
